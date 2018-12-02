@@ -11,7 +11,7 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="Export DB to XML..." Click="ExportToXMLClicked"/>
+                    <MenuItem Header="Export DB to XML..." Click="ExportToXMLClicked" />
                     <MenuItem Header="_Exit" Click="ExitClicked" />
                 </MenuItem>
             </Menu>
@@ -119,8 +119,18 @@
                         <RowDefinition Height="1*" />
                         <RowDefinition Height="10*" />
                     </Grid.RowDefinitions>
-                    <Label Content="Filtered items: " Margin="5,0,0,0"/>
-                    <DataGrid Grid.Row="1" Grid.Column="0" Margin="10,0,0,10" />
+                    <Label Content="Filtered items: " Margin="5,0,0,0" />
+                    <DataGrid Name="DataGrid" ItemsSource="{Binding Players}" GridLinesVisibility="None" AutoGenerateColumns="false" Grid.Row="1"
+                              Grid.Column="0" Margin="10,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding KrpId}" Width="*" Header="KRP" />
+                            <DataGridTextColumn Width="*" Binding="{Binding FirstName}" Header="First name" />
+                            <DataGridTextColumn Width="*" Binding="{Binding LastName}" Header="Last name" />
+                            <DataGridTextColumn Width="*" Binding="{Binding YearOfBirth}" Header="Year of birth" />
+                            <DataGridTextColumn Width="*" Binding="{Binding AgeCategory}" Header="Age category" />
+                            <DataGridTextColumn Width="*" Binding="{Binding ClubId}" Header="Club" />
+                        </DataGrid.Columns>
+                    </DataGrid>
                     <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Top">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />

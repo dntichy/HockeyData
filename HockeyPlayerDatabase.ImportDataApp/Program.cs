@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using HockeyPlayerDatabase.Interfaces;
 using HockeyPlayerDatabase.Model;
 using NDesk.Options;
 
@@ -10,11 +12,14 @@ namespace HockeyPlayerDatabase.ImportDataApp
 {
     partial class Program
     {
+        private static HockeyContext _context = new HockeyContext();
+
         static void Main(string[] args)
         {
             bool clearDatabase = false;
             String clubs = null, players = null;
 
+            //parse arguments
             var p = new OptionSet()
             {
                 {"clearDatabase", v => clearDatabase = v != null},
@@ -32,36 +37,49 @@ namespace HockeyPlayerDatabase.ImportDataApp
                 return;
             }
 
-            //create context
-            HockeyContext context = new HockeyContext();
 
             //clean if defined
-            if (clearDatabase) CleanDb(context);
+            if (clearDatabase) CleanDb();
 
             //import data to tables
-            List<Player> playersList = ParsePlayers(players);
-            List<Club> clubsList = ParseClubs(clubs);
+            ImportClubsIntoDb(ParseClubs(clubs));
+            ImportPlayersIntoDb(ParsePlayers(players));
         }
 
-        private static void CleanDb(HockeyContext context)
+        private static void CleanDb()
         {
-            context.Database.ExecuteSqlCommand("delete from Players");
-            context.Database.ExecuteSqlCommand("delete from Clubs");
+            _context.Database.ExecuteSqlCommand("delete from Players");
+            _context.Database.ExecuteSqlCommand("delete from Clubs");
         }
 
-        private static Boolean CreateTables()
+        private static Boolean ImportPlayersIntoDb(List<Player> players)
         {
-            return false;
+            foreach (var player in players)
+            {
+                _context.Players.Add(player);
+            }
+
+            _context.SaveChanges();
+            return true;
         }
 
-        private static Boolean ImportIntoDb()
+        private static Boolean ImportClubsIntoDb(List<Club> clubs)
         {
-            return false;
+            foreach (var club in clubs)
+            {
+                _context.Clubs.Add(club);
+            }
+
+            _context.SaveChanges();
+            return true;
         }
 
         private static List<Player> ParsePlayers(string path)
         {
             List<Player> playersList = new List<Player>();
+
+            var clubIds = _context.Clubs.Select(n => new {n.Id, n.Name});
+
             using (var rd = new StreamReader(path))
             {
                 bool skipFirstRow = true;
@@ -71,13 +89,41 @@ namespace HockeyPlayerDatabase.ImportDataApp
                     if (!skipFirstRow)
                     {
                         Player player = new Player();
-                        player.LastName = splits[0];
+                        player.LastName = splits[0].Substring(0, 1).ToUpper() + splits[0].Substring(1).ToLower();
                         player.FirstName = splits[1];
                         player.TitleBefore = splits[2];
                         player.YearOfBirth = Convert.ToInt32(splits[3]);
                         player.KrpId = Convert.ToInt32(splits[4]);
-                        string clubId = splits[5]; //TODO what to do with this?
+                        string clubId = splits[5];
+                        var id = clubIds.Where(n => n.Name.Equals(clubId)).Select(n => n.Id).First();
+                        player.ClubId = id;
 
+                        AgeCategory ageCategory = AgeCategory.Cadet;
+                        switch (splits[6].ToLower())
+                        {
+                            case "juniori":
+                            {
+                                ageCategory = AgeCategory.Junior;
+                                break;
+                            }
+                            case "dorastenci":
+                            {
+                                ageCategory = AgeCategory.Midgest;
+                                break;
+                            }
+                            case "seniori":
+                            {
+                                ageCategory = AgeCategory.Senior;
+                                break;
+                            }
+                            case "kadeti":
+                            {
+                                ageCategory = AgeCategory.Cadet;
+                                break;
+                            }
+                        }
+
+                        player.AgeCategory = ageCategory;
                         playersList.Add(player);
                     }
 
@@ -90,28 +136,35 @@ namespace HockeyPlayerDatabase.ImportDataApp
 
         private static List<Club> ParseClubs(string path)
         {
-            List<Club> clubsList = new List<Club>();
-
-            using (var rd = new StreamReader(path))
+            try
             {
-                bool skipFirstRow = true;
-                while (!rd.EndOfStream)
+                List<Club> clubsList = new List<Club>();
+
+                using (var rd = new StreamReader(path))
                 {
-                    var splits = rd.ReadLine().Split(';');
-                    if (!skipFirstRow)
+                    bool skipFirstRow = true;
+                    while (!rd.EndOfStream)
                     {
-                        Club club = new Club();
-                        club.Name = splits[0];
-                        club.Address = splits[1];
-                        club.Url = splits[2];
-                        clubsList.Add(club);
+                        var splits = rd.ReadLine().Split(';');
+                        if (!skipFirstRow)
+                        {
+                            Club club = new Club();
+                            club.Name = splits[0];
+                            club.Address = splits[1];
+                            club.Url = splits[2];
+                            clubsList.Add(club);
+                        }
+
+                        skipFirstRow = false;
                     }
-
-                    skipFirstRow = false;
                 }
-            }
 
-            return clubsList;
+                return clubsList;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.StackTrace);
+            }
         }
     }
 }

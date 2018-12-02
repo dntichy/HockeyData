@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,28 +22,29 @@ namespace HockeyPlayerDatabase.MainApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        private HockeyContext Context { get; }
+        public ObservableCollection<Object> Players { get; }
+
         public MainWindow()
         {
             InitializeComponent();
-            HockeyContext context = new HockeyContext();
-            
-            Player p = new Player();
-            p.Id = 1;
-            p.FirstName = "fweqfwefx";
-            p.LastName = "asdfasfasd";
-            context.Players.Add(p);
-            int i = context.SaveChanges();
-            
+            Context = new HockeyContext();
+
+            Players = new ObservableCollection<Object>(
+                Context
+                    .GetPlayers()
+                    .Select(
+                        n => new {n.KrpId, n.FirstName, n.LastName, n.YearOfBirth, n.AgeCategory, n.ClubId})
+                    .ToArray());
+            DataContext = this;
         }
 
         private void ApplyClicked(object sender, RoutedEventArgs e)
         {
-
         }
 
         private void AddClicked(object sender, RoutedEventArgs e)
         {
-
         }
 
         private void RemoveClicked(object sender, RoutedEventArgs e)

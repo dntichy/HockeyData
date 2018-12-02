@@ -48,7 +48,7 @@ namespace HockeyPlayerDatabase.Model
 
         public IQueryable<Player> GetPlayers()
         {
-            return Players;
+            return Players.Select(n=>n);
         }
 
         public IEnumerable<Player> GetPlayersByAge(int minAge, int maxAge)

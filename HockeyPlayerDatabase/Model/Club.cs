@@ -14,9 +14,7 @@ namespace HockeyPlayerDatabase.Model
         public string Address { get; set; }
         public string Url { get; set; }
 
-
-        //todo ask shouldn't here be something like??
-        public virtual ICollection<Player> Teachers { get; set; }
+        public virtual ICollection<Player> Players { get; set; }
 
     }
 }
