@@ -88,12 +88,14 @@ namespace HockeyPlayerDatabase.ImportDataApp
                     var splits = rd.ReadLine().Split(';');
                     if (!skipFirstRow)
                     {
-                        Player player = new Player();
-                        player.LastName = splits[0].Substring(0, 1).ToUpper() + splits[0].Substring(1).ToLower();
-                        player.FirstName = splits[1];
-                        player.TitleBefore = splits[2];
-                        player.YearOfBirth = Convert.ToInt32(splits[3]);
-                        player.KrpId = Convert.ToInt32(splits[4]);
+                        Player player = new Player
+                        {
+                            LastName = splits[0].Substring(0, 1).ToUpper() + splits[0].Substring(1).ToLower(),
+                            FirstName = splits[1],
+                            TitleBefore = splits[2],
+                            YearOfBirth = Convert.ToInt32(splits[3]),
+                            KrpId = Convert.ToInt32(splits[4])
+                        };
                         string clubId = splits[5];
                         var id = clubIds.Where(n => n.Name.Equals(clubId)).Select(n => n.Id).First();
                         player.ClubId = id;
@@ -148,10 +150,7 @@ namespace HockeyPlayerDatabase.ImportDataApp
                         var splits = rd.ReadLine().Split(';');
                         if (!skipFirstRow)
                         {
-                            Club club = new Club();
-                            club.Name = splits[0];
-                            club.Address = splits[1];
-                            club.Url = splits[2];
+                            Club club = new Club {Name = splits[0], Address = splits[1], Url = splits[2]};
                             clubsList.Add(club);
                         }
 

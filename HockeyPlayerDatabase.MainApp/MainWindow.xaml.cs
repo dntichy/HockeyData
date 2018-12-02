@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using HockeyPlayerDatabase.Model;
 
 namespace HockeyPlayerDatabase.MainApp
@@ -23,19 +13,37 @@ namespace HockeyPlayerDatabase.MainApp
     public partial class MainWindow : Window
     {
         private HockeyContext Context { get; }
-        public ObservableCollection<Object> Players { get; }
+        public ObservableCollection<WrapperClubPlayer> Players { get; }
 
         public MainWindow()
         {
             InitializeComponent();
             Context = new HockeyContext();
 
-            Players = new ObservableCollection<Object>(
-                Context
-                    .GetPlayers()
+            var Data =
+                (from players in Context.Players
+                    join clubs in Context.Clubs on players.ClubId equals clubs.Id
+                    select new {players, clubs}).ToArray();
+
+
+            Players = new ObservableCollection<WrapperClubPlayer>(
+                Data
                     .Select(
-                        n => new {n.KrpId, n.FirstName, n.LastName, n.YearOfBirth, n.AgeCategory, n.ClubId})
+                        n =>
+                            new WrapperClubPlayer()
+                            {
+                                KrpId = n.players.KrpId,
+                                FirstName = n.players.FirstName,
+                                LastName = n.players.LastName,
+                                YearOfBirth = n.players.YearOfBirth,
+                                AgeCategory = n.players.AgeCategory,
+                                ClubName = n.clubs.Name,
+                                Url = n.clubs.Url
+                            }
+                    )
                     .ToArray());
+
+
             DataContext = this;
         }
 
@@ -45,6 +53,9 @@ namespace HockeyPlayerDatabase.MainApp
 
         private void AddClicked(object sender, RoutedEventArgs e)
         {
+            AddWindowDialog window = new AddWindowDialog(Context);
+            window.DataContext = this;
+            window.Show();
         }
 
         private void RemoveClicked(object sender, RoutedEventArgs e)
@@ -57,14 +68,19 @@ namespace HockeyPlayerDatabase.MainApp
             throw new NotImplementedException();
         }
 
-        private void OpenClubURLClicked(object sender, RoutedEventArgs e)
+        private void OpenClubUrlClicked(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (DataGrid.SelectedItems.Count == 1)
+            {
+                var a = (WrapperClubPlayer) DataGrid.SelectedItem;
+                if (a.Url != "") System.Diagnostics.Process.Start(a.Url);
+            }
         }
 
         private void ExitClicked(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            System.Windows.Application.Current.Shutdown();
+            //https://stackoverflow.com/questions/2820357/how-do-i-exit-a-wpf-application-programmatically
         }
 
         private void ExportToXMLClicked(object sender, RoutedEventArgs e)
