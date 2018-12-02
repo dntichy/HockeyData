@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using HockeyPlayerDatabase.Model;
 
 namespace HockeyPlayerDatabase.MainApp
 {
@@ -23,6 +24,15 @@ namespace HockeyPlayerDatabase.MainApp
         public MainWindow()
         {
             InitializeComponent();
+            HockeyContext context = new HockeyContext();
+            
+            Player p = new Player();
+            p.Id = 1;
+            p.FirstName = "fweqfwefx";
+            p.LastName = "asdfasfasd";
+            context.Players.Add(p);
+            int i = context.SaveChanges();
+            
         }
 
         private void ApplyClicked(object sender, RoutedEventArgs e)
@@ -46,6 +56,16 @@ namespace HockeyPlayerDatabase.MainApp
         }
 
         private void OpenClubURLClicked(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ExitClicked(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ExportToXMLClicked(object sender, RoutedEventArgs e)
         {
             throw new NotImplementedException();
         }

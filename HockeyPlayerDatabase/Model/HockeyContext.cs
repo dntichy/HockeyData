@@ -7,7 +7,7 @@ using HockeyPlayerDatabase.Interfaces;
 
 namespace HockeyPlayerDatabase.Model
 {
-    class HockeyContext : DbContext, IHockeyReport<Club, Player>
+    public class HockeyContext : DbContext, IHockeyReport<Club, Player>
     {
         public DbSet<Player> Players { get; set; }
         public DbSet<Club> Clubs { get; set; }
@@ -27,32 +27,36 @@ namespace HockeyPlayerDatabase.Model
 
         public IQueryable<Club> GetClubs()
         {
-            throw new NotImplementedException();
+            return Clubs;
         }
 
         public IEnumerable<IGrouping<int, Player>> GetGroupedPlayersByYearOfBirth()
         {
-            throw new NotImplementedException();
+            return Players.Select(n => n).GroupBy(n => n.YearOfBirth);
         }
 
         public Player GetOldestPlayer()
         {
-            throw new NotImplementedException();
+            return Players.Select(n => n).OrderBy(n => n.YearOfBirth).First();
         }
 
         public double GetPlayerAverageAge()
         {
-            throw new NotImplementedException();
+            return Players.Select(n => n).Average(n =>
+                DateTime.Parse(DateTime.Now.ToString()).Year - n.YearOfBirth);
         }
 
         public IQueryable<Player> GetPlayers()
         {
-            throw new NotImplementedException();
+            return Players;
         }
 
         public IEnumerable<Player> GetPlayersByAge(int minAge, int maxAge)
         {
-            throw new NotImplementedException();
+            return Players
+                .Where(n => DateTime.Parse(DateTime.Now.ToString()).Year - n.YearOfBirth > minAge
+                            && DateTime.Parse(DateTime.Now.ToString()).Year - n.YearOfBirth < maxAge)
+                .Select(n => n);
         }
 
         public IDictionary<AgeCategory, ReportResult> GetReportByAgeCategory()
@@ -67,17 +71,17 @@ namespace HockeyPlayerDatabase.Model
 
         public IEnumerable<Club> GetSortedClubs(int maxResultCount)
         {
-            throw new NotImplementedException();
+            return Clubs.Select(n => n).OrderBy(n => n.Name).Take(maxResultCount);
         }
 
         public IEnumerable<Player> GetSortedPlayers(int maxResultCount)
         {
-            throw new NotImplementedException();
+            return Players.Select(n => n).OrderBy(n => n.FullName).Take(maxResultCount);
         }
 
         public Player GetYoungestPlayer()
         {
-            throw new NotImplementedException();
+            return Players.Select(n => n).OrderByDescending(n => n.YearOfBirth).First();
         }
 
         public void SaveToXml(string fileName)

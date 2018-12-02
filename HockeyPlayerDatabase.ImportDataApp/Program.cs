@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HockeyPlayerDatabase.Model;
 using NDesk.Options;
-using Excel = Microsoft.Office.Interop.Excel;
 
 
 namespace HockeyPlayerDatabase.ImportDataApp
@@ -36,14 +32,21 @@ namespace HockeyPlayerDatabase.ImportDataApp
                 return;
             }
 
-            if (clearDatabase) CleanDb();
+            //create context
+            HockeyContext context = new HockeyContext();
+
+            //clean if defined
+            if (clearDatabase) CleanDb(context);
+
+            //import data to tables
             List<Player> playersList = ParsePlayers(players);
             List<Club> clubsList = ParseClubs(clubs);
         }
 
-        private static void CleanDb()
+        private static void CleanDb(HockeyContext context)
         {
-            //TODO how to reference context?
+            context.Database.ExecuteSqlCommand("delete from Players");
+            context.Database.ExecuteSqlCommand("delete from Clubs");
         }
 
         private static Boolean CreateTables()
