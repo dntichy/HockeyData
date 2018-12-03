@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HockeyPlayerDatabase.MainApp"
         mc:Ignorable="d"
-        Title="Player" Height="350" Width="350">
+        Title="Player" Height="350" Width="350"
+        WindowStartupLocation="CenterOwner">
+    <!-- https://www.codeproject.com/Articles/37278/WPF-Center-Child-Window-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />

@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using HockeyPlayerDatabase.Interfaces;
 using HockeyPlayerDatabase.Model;
 
@@ -21,7 +16,6 @@ namespace HockeyPlayerDatabase.MainApp
         private HockeyContext Context { get; }
         public ObservableCollection<WrapperClubPlayer> Players { get; set; }
 
-
         public MainWindow()
         {
             InitializeComponent();
@@ -33,10 +27,38 @@ namespace HockeyPlayerDatabase.MainApp
 
         private void ApplyClicked(object sender, RoutedEventArgs e)
         {
+           RefreshDataGrid();
+        }
+
+        private void AddClicked(object sender, RoutedEventArgs e)
+        {
+            AddWindowDialog window = new AddWindowDialog(Context, this, null);
+            window.Owner = App.Current.MainWindow;
+            window.ShowDialog();
+        }
+
+        private void RemoveClicked(object sender, RoutedEventArgs e)
+        {
+            if (DataGrid.SelectedItems.Count == 1)
+            {
+                var row = (WrapperClubPlayer) DataGrid.SelectedItem;
+                List<Player> p = Context.Players.Select(n => n).Where(n => n.Id == row.Id).ToList();
+                Context.Players.RemoveRange(p);
+                Context.SaveChanges();
+                RefreshDataGrid();
+            }
+            else MessageBox.Show("Zvoľte riadok na vymazanie", "Zmazanie");
+        }
+
+        internal void RefreshDataGrid()
+        {
+            //DataGrid.ItemsSource = Players;
+            //https://stackoverflow.com/questions/11324688/how-to-refresh-datagrid-in-wpf
+
             var Data =
-                (from players in Context.Players
-                    join clubs in Context.Clubs on players.ClubId equals clubs.Id
-                    select new {players, clubs}).ToArray();
+               (from players in Context.Players
+                join clubs in Context.Clubs on players.ClubId equals clubs.Id
+                select new { players, clubs }).ToArray();
 
             Players = new ObservableCollection<WrapperClubPlayer>(
                 Data
@@ -52,7 +74,9 @@ namespace HockeyPlayerDatabase.MainApp
                                 YearOfBirth = n.players.YearOfBirth,
                                 AgeCategory = n.players.AgeCategory,
                                 ClubName = n.clubs.Name,
-                                Url = n.clubs.Url
+                                Url = n.clubs.Url,
+                                TitleBefore = n.players.TitleBefore
+
                             }
                     )
                     .Where(n => n.ClubName.ToLower().Contains(ClubTextBox.Text.ToLower()))
@@ -79,83 +103,20 @@ namespace HockeyPlayerDatabase.MainApp
                         if (list.Count == 0) return true;
                         else return list.Contains(n.AgeCategory.Value);
                     })
-                    //.Where(n =>
-                    //{
-                    //    if (JuniorCheckBox.IsChecked != null) return n.AgeCategory == AgeCategory.Junior;
-                    //    return false;
-                    //})
-                    //.Where(n =>
-                    //{
-                    //    if (SeniorCheckBox.IsChecked != null) return n.AgeCategory == AgeCategory.Senior;
-                    //    return false;
-                    //})
-                    //.Where(n =>
-                    //{
-                    //    if (MidgesCheckBox.IsChecked != null) return n.AgeCategory == AgeCategory.Midgest;
-                    //    return false;
-                    //})
                     .ToArray());
 
             DataGrid.ItemsSource = Players;
-        }
-
-        private void AddClicked(object sender, RoutedEventArgs e)
-        {
-            AddWindowDialog window = new AddWindowDialog(Context, this);
-            window.DataContext = this;
-            window.ShowDialog();
-        }
-
-        private void RemoveClicked(object sender, RoutedEventArgs e)
-        {
-            if (DataGrid.SelectedItems.Count == 1)
-            {
-                var a = (WrapperClubPlayer) DataGrid.SelectedItem;
-                List<Player> p = Context.Players.Select(n => n).Where(n => n.Id == a.Id).ToList();
-                Context.Players.RemoveRange(p);
-                Context.SaveChanges();
-                RefreshDataGrid();
-            }
-        }
-
-        internal void RefreshDataGrid()
-        {
-            var Data =
-                (from players in Context.Players
-                    join clubs in Context.Clubs on players.ClubId equals clubs.Id
-                    select new {players, clubs}).ToArray();
-
-
-            Players = new ObservableCollection<WrapperClubPlayer>(
-                Data
-                    .Select(
-                        n =>
-                            new WrapperClubPlayer()
-                            {
-                                Id = n.players.Id,
-                                ClubId = n.clubs.Id,
-                                KrpId = n.players.KrpId,
-                                FirstName = n.players.FirstName,
-                                LastName = n.players.LastName,
-                                YearOfBirth = n.players.YearOfBirth,
-                                AgeCategory = n.players.AgeCategory,
-                                ClubName = n.clubs.Name,
-                                Url = n.clubs.Url
-                            }
-                    )
-                    .ToArray());
-
-            DataGrid.ItemsSource = Players;
-            //https://stackoverflow.com/questions/11324688/how-to-refresh-datagrid-in-wpf
+            FilteredItemsLabel.Content = "Filtered items: " + Players.Count + " / " + Data.Length;
         }
 
         private void EditClicked(object sender, RoutedEventArgs e)
         {
             if (DataGrid.SelectedItems.Count == 1)
             {
-                var a = (WrapperClubPlayer) DataGrid.SelectedItem;
+                var row = (WrapperClubPlayer) DataGrid.SelectedItem;
 
-                AddWindowDialog window = new AddWindowDialog(Context, this) {DataContext = this};
+                AddWindowDialog window = new AddWindowDialog(Context, this, row);
+                window.Owner = App.Current.MainWindow;
                 window.ShowDialog();
             }
             else MessageBox.Show("Zvoľte riadok na editáciu", "Editácia");
@@ -174,8 +135,7 @@ namespace HockeyPlayerDatabase.MainApp
 
         private void ExitClicked(object sender, RoutedEventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
-            //https://stackoverflow.com/questions/2820357/how-do-i-exit-a-wpf-application-programmatically
+            System.Windows.Application.Current.Shutdown(); //https://stackoverflow.com/questions/2820357/how-do-i-exit-a-wpf-application-programmatically
         }
 
         private void ExportToXMLClicked(object sender, RoutedEventArgs e)

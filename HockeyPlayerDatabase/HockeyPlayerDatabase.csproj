@@ -52,6 +52,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\201812020911257_InitialCreate.cs" />
+    <Compile Include="Migrations\201812020911257_InitialCreate.Designer.cs">
+      <DependentUpon>201812020911257_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812032308552_test.cs" />
+    <Compile Include="Migrations\201812032308552_test.Designer.cs">
+      <DependentUpon>201812032308552_test.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\Club.cs" />
     <Compile Include="Model\HockeyContext.cs" />
     <Compile Include="Model\Player.cs" />
@@ -60,6 +69,14 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201812020911257_InitialCreate.resx">
+      <DependentUpon>201812020911257_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812032308552_test.resx">
+      <DependentUpon>201812032308552_test.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

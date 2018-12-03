@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HockeyPlayerDatabase.MainApp"
         mc:Ignorable="d"
         Title="Hockey Player Database" Height="470" Width="900">
     <Grid>
@@ -119,7 +118,7 @@
                         <RowDefinition Height="1*" />
                         <RowDefinition Height="10*" />
                     </Grid.RowDefinitions>
-                    <Label Content="Filtered items: " Margin="5,0,0,0" />
+                    <Label Content="Filtered items: " Margin="5,0,0,0" Name="FilteredItemsLabel" />
                     <DataGrid CanUserAddRows="false"
                               Name="DataGrid" ItemsSource="{Binding Players}" GridLinesVisibility="None" AutoGenerateColumns="false" Grid.Row="1"
                               Grid.Column="0" Margin="12,0,125,10" Grid.ColumnSpan="2">

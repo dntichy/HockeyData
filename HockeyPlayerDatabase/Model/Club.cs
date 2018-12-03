@@ -13,8 +13,5 @@ namespace HockeyPlayerDatabase.Model
         public string Name { get; set; }
         public string Address { get; set; }
         public string Url { get; set; }
-
-        public virtual ICollection<Player> Players { get; set; }
-
     }
 }
