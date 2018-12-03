@@ -44,19 +44,19 @@
                         </Grid.RowDefinitions>
                         <Label Grid.Column="0" Grid.Row="0" Content="KRP:" HorizontalAlignment="Left"
                                VerticalAlignment="Center" Margin="0" />
-                        <TextBox Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        <TextBox Name="KrpIdTextBox" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                                  Margin="5,0,0,0" />
                         <Button Grid.Column="0" Grid.Row="2" Content="Apply" Grid.ColumnSpan="6"
                                 VerticalAlignment="Center" Margin="5,0" Click="ApplyClicked" />
 
                         <Label Grid.Column="1" Grid.Row="0" Content="First name:" HorizontalAlignment="Left"
                                VerticalAlignment="Center" Margin="0" />
-                        <TextBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        <TextBox Name="FirstNameTextBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                                  Margin="5,0,0,0" />
 
                         <Label Grid.Column="2" Grid.Row="0" Content="Last name:" HorizontalAlignment="Left"
                                VerticalAlignment="Center" Margin="0" />
-                        <TextBox Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        <TextBox Name="LastNameTextBox" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                                  Margin="5,0,0,0" />
 
                         <Label Grid.Column="3" Grid.Row="0" Content="Year of birth (from - to):"
@@ -71,11 +71,11 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="1*" />
                             </Grid.RowDefinitions>
-                            <TextBox Grid.Column="0" VerticalAlignment="Center"
+                            <TextBox Name="YearFromTextBox" Grid.Column="0" VerticalAlignment="Center"
                                      Margin="5,0,0,0" />
                             <Label Grid.Column="1" Content="-" HorizontalAlignment="Center" VerticalAlignment="Top"
                                    Margin="2,0" />
-                            <TextBox Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                            <TextBox Name="YearToTextBox" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
                         </Grid>
 
 
@@ -92,18 +92,18 @@
                                 <RowDefinition Height="1*" />
                             </Grid.RowDefinitions>
 
-                            <CheckBox>Cadet</CheckBox>
-                            <CheckBox Grid.Row="1" Grid.Column="0">Junior</CheckBox>
+                            <CheckBox Name="CadetCheckBox">Cadet</CheckBox>
+                            <CheckBox Name="JuniorCheckBox" Grid.Row="1" Grid.Column="0">Junior</CheckBox>
 
-                            <CheckBox Grid.Row="0" Grid.Column="1">Midges</CheckBox>
-                            <CheckBox Grid.Row="1" Grid.Column="1">Senior</CheckBox>
+                            <CheckBox Name="MidgesCheckBox" Grid.Row="0" Grid.Column="1">Midges</CheckBox>
+                            <CheckBox Name="SeniorCheckBox" Grid.Row="1" Grid.Column="1">Senior</CheckBox>
 
                         </Grid>
 
 
                         <Label Grid.Column="5" Grid.Row="0" Content="Club:" HorizontalAlignment="Left"
                                VerticalAlignment="Center" Margin="0" />
-                        <TextBox Grid.Column="5" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        <TextBox Name="ClubTextBox" Grid.Column="5" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                                  Margin="5,0,5,0" />
                     </Grid>
                 </GroupBox>
@@ -120,7 +120,8 @@
                         <RowDefinition Height="10*" />
                     </Grid.RowDefinitions>
                     <Label Content="Filtered items: " Margin="5,0,0,0" />
-                    <DataGrid Name="DataGrid" ItemsSource="{Binding Players}" GridLinesVisibility="None" AutoGenerateColumns="false" Grid.Row="1"
+                    <DataGrid CanUserAddRows="false"
+                              Name="DataGrid" ItemsSource="{Binding Players}" GridLinesVisibility="None" AutoGenerateColumns="false" Grid.Row="1"
                               Grid.Column="0" Margin="12,0,125,10" Grid.ColumnSpan="2">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding KrpId}" Width="*" Header="KRP" />

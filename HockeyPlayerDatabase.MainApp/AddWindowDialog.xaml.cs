@@ -12,10 +12,12 @@ namespace HockeyPlayerDatabase.MainApp
     public partial class AddWindowDialog : Window
     {
         private readonly HockeyContext _context;
+        private MainWindow _parent;
 
-        public AddWindowDialog(HockeyContext context)
+        public AddWindowDialog(HockeyContext context, MainWindow parent)
         {
             this._context = context;
+            this._parent = parent;
             InitializeComponent();
 
             var clubs = context.Clubs.Select(n => n.Name);
@@ -55,6 +57,8 @@ namespace HockeyPlayerDatabase.MainApp
                 };
                 _context.Players.Add(p);
                 _context.SaveChanges();
+                _parent.RefreshDataGrid();
+
                 this.Close();
             }
         }
