@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Xml;
+using System.Xml.Serialization;
 using HockeyPlayerDatabase.Interfaces;
 using HockeyPlayerDatabase.Model;
 
@@ -135,12 +137,26 @@ namespace HockeyPlayerDatabase.MainApp
 
         private void ExitClicked(object sender, RoutedEventArgs e)
         {
-            System.Windows.Application.Current.Shutdown(); //https://stackoverflow.com/questions/2820357/how-do-i-exit-a-wpf-application-programmatically
+            System.Windows.Application.Current.Shutdown(); 
+            //https://stackoverflow.com/questions/2820357/how-do-i-exit-a-wpf-application-programmatically
         }
 
         private void ExportToXMLClicked(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            XmlSerializer xsSubmit = new XmlSerializer(typeof(WrapperSerializingData));
+            WrapperSerializingData wpData = new WrapperSerializingData(Context.Players.ToList(), Context.Clubs.ToList());
+            var xml = "";
+
+            using (var sww = new StringWriter())
+            {
+                using (XmlWriter writer = XmlWriter.Create(sww))
+                {
+                    xsSubmit.Serialize(writer, wpData);
+                    xml = sww.ToString(); // Your XML
+                    File.WriteAllText("players.xml", xml);
+                }
+            }
+            //https://stackoverflow.com/questions/4123590/serialize-an-object-to-xml
         }
     }
 }
