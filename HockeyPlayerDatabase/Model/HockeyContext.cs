@@ -42,13 +42,13 @@ namespace HockeyPlayerDatabase.Model
 
         public double GetPlayerAverageAge()
         {
-            return Players.Select(n => n).Average(n =>
-                DateTime.Parse(DateTime.Now.ToString()).Year - n.YearOfBirth);
+            return Players.Select(n => n).Average(n => DateTime.Now.Year - n.YearOfBirth);
+            //https://stackoverflow.com/questions/4694352/using-only-the-year-part-of-a-date-for-a-where-condition
         }
 
         public IQueryable<Player> GetPlayers()
         {
-            return Players.Select(n=>n);
+            return Players.Select(n => n);
         }
 
         public IEnumerable<Player> GetPlayersByAge(int minAge, int maxAge)
@@ -71,12 +71,13 @@ namespace HockeyPlayerDatabase.Model
 
         public IEnumerable<Club> GetSortedClubs(int maxResultCount)
         {
-            return Clubs.Select(n => n).OrderBy(n => n.Name).Take(maxResultCount);
+            return Clubs.OrderByDescending(m => Players.Count(n => n.ClubId == m.Id)).Take(maxResultCount);
+
         }
 
         public IEnumerable<Player> GetSortedPlayers(int maxResultCount)
         {
-            return Players.Select(n => n).OrderBy(n => n.FullName).Take(maxResultCount);
+            return Players.OrderBy(n => n.LastName).ThenByDescending(n => n.FirstName).Take(maxResultCount);
         }
 
         public Player GetYoungestPlayer()

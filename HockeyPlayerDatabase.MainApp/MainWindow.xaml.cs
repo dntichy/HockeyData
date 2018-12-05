@@ -141,7 +141,7 @@ namespace HockeyPlayerDatabase.MainApp
             //https://stackoverflow.com/questions/2820357/how-do-i-exit-a-wpf-application-programmatically
         }
 
-        private void ExportToXMLClicked(object sender, RoutedEventArgs e)
+        private void ExportToXmlClicked(object sender, RoutedEventArgs e)
         {
             XmlSerializer xsSubmit = new XmlSerializer(typeof(WrapperSerializingData));
             WrapperSerializingData wpData = new WrapperSerializingData(Context.Players.ToList(), Context.Clubs.ToList());

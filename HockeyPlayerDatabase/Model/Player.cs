@@ -18,6 +18,9 @@ namespace HockeyPlayerDatabase.Model
         public AgeCategory? AgeCategory { get; set; }
         public int? ClubId { get; set; }
 
-
+        public override string ToString()
+        {
+            return FirstName + " " + LastName + " " + KrpId;
+        }
     }
 }
