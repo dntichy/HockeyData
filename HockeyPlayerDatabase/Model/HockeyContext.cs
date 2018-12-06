@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
+using System.Xml;
+using System.Xml.Serialization;
 using HockeyPlayerDatabase.Interfaces;
 
 namespace HockeyPlayerDatabase.Model
@@ -94,7 +98,19 @@ namespace HockeyPlayerDatabase.Model
 
         public void SaveToXml(string fileName)
         {
-            throw new NotImplementedException();
+            XmlSerializer xsSubmit = new XmlSerializer(typeof(WrapperSerializingData));
+            WrapperSerializingData wpData = new WrapperSerializingData(Players.ToList(), Clubs.ToList());
+            var xml = "";
+
+            using (var sww = new StringWriter())
+            {
+                using (var writer = XmlWriter.Create(sww))
+                {
+                    xsSubmit.Serialize(writer, wpData);
+                    xml = sww.ToString();
+                    File.WriteAllText("data.xml", xml);
+                }
+            }
         }
 
         private ReportResult GetReportResult(IQueryable<Player> players)
