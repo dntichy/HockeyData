@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
 using HockeyPlayerDatabase.Interfaces;
 
@@ -61,18 +60,26 @@ namespace HockeyPlayerDatabase.Model
 
         public IDictionary<AgeCategory, ReportResult> GetReportByAgeCategory()
         {
-            throw new NotImplementedException();
+            var dictionary = new Dictionary<AgeCategory, ReportResult>();
+
+            foreach (var category in Enum.GetValues(typeof(AgeCategory)).Cast<AgeCategory>())
+            {
+                var players = Players.Where(p => p.AgeCategory == category);
+                dictionary.Add(category, GetReportResult(players));
+            }
+
+            return dictionary;
         }
 
         public ReportResult GetReportByClub(int clubId)
         {
-            throw new NotImplementedException();
+            var players = Players.Where(n => n.ClubId == clubId);
+            return GetReportResult(players);
         }
 
         public IEnumerable<Club> GetSortedClubs(int maxResultCount)
         {
             return Clubs.OrderByDescending(m => Players.Count(n => n.ClubId == m.Id)).Take(maxResultCount);
-
         }
 
         public IEnumerable<Player> GetSortedPlayers(int maxResultCount)
@@ -88,6 +95,17 @@ namespace HockeyPlayerDatabase.Model
         public void SaveToXml(string fileName)
         {
             throw new NotImplementedException();
+        }
+
+        private ReportResult GetReportResult(IQueryable<Player> players)
+        {
+            var average = players.Average(n => DateTime.Now.Year - n.YearOfBirth);
+            var youngestPlayer = players.OrderByDescending(n => n.YearOfBirth).First();
+            var oldestPlayer = players.OrderBy(n => n.YearOfBirth).First();
+
+            return new ReportResult(players.Count(), average,
+                youngestPlayer.FullName, oldestPlayer.FullName,
+                DateTime.Now.Year - youngestPlayer.YearOfBirth, DateTime.Now.Year - oldestPlayer.YearOfBirth);
         }
     }
 }

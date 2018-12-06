@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using HockeyPlayerDatabase.Interfaces;
 
 namespace HockeyPlayerDatabase.Model

@@ -34,8 +34,7 @@ namespace HockeyPlayerDatabase.MainApp
 
         private void AddClicked(object sender, RoutedEventArgs e)
         {
-            AddWindowDialog window = new AddWindowDialog(Context, this, null);
-            window.Owner = App.Current.MainWindow;
+            AddWindowDialog window = new AddWindowDialog(Context, this, null) {Owner = App.Current.MainWindow};
             window.ShowDialog();
         }
 
@@ -117,8 +116,7 @@ namespace HockeyPlayerDatabase.MainApp
             {
                 var row = (WrapperClubPlayer) DataGrid.SelectedItem;
 
-                AddWindowDialog window = new AddWindowDialog(Context, this, row);
-                window.Owner = App.Current.MainWindow;
+                AddWindowDialog window = new AddWindowDialog(Context, this, row) {Owner = App.Current.MainWindow};
                 window.ShowDialog();
             }
             else MessageBox.Show("Zvoľte riadok na editáciu", "Editácia");
