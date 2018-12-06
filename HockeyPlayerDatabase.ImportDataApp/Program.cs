@@ -14,7 +14,7 @@ namespace HockeyPlayerDatabase.ImportDataApp
     {
         private static HockeyContext _context = new HockeyContext();
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             bool clearDatabase = false;
             String clubs = null, players = null;
@@ -34,7 +34,7 @@ namespace HockeyPlayerDatabase.ImportDataApp
             catch (OptionException e)
             {
                 Console.WriteLine(e.Message);
-                return;
+                return 1;
             }
 
 
@@ -42,8 +42,8 @@ namespace HockeyPlayerDatabase.ImportDataApp
             if (clearDatabase) CleanDb();
 
             //import data to tables
-            ImportClubsIntoDb(ParseClubs(clubs));
-            ImportPlayersIntoDb(ParsePlayers(players));
+            if (ImportClubsIntoDb(ParseClubs(clubs)) && ImportPlayersIntoDb(ParsePlayers(players))) return 0;
+            return 1;
         }
 
         private static void CleanDb()
@@ -76,64 +76,71 @@ namespace HockeyPlayerDatabase.ImportDataApp
 
         private static List<Player> ParsePlayers(string path)
         {
-            List<Player> playersList = new List<Player>();
-
-            var clubIds = _context.Clubs.Select(n => new {n.Id, n.Name});
-
-            using (var rd = new StreamReader(path))
+            try
             {
-                bool skipFirstRow = true;
-                while (!rd.EndOfStream)
-                {
-                    var splits = rd.ReadLine().Split(';');
-                    if (!skipFirstRow)
-                    {
-                        Player player = new Player
-                        {
-                            LastName = splits[0].Substring(0, 1).ToUpper() + splits[0].Substring(1).ToLower(),
-                            FirstName = splits[1],
-                            TitleBefore = splits[2],
-                            YearOfBirth = Convert.ToInt32(splits[3]),
-                            KrpId = Convert.ToInt32(splits[4])
-                        };
-                        string clubId = splits[5];
-                        var id = clubIds.Where(n => n.Name.Equals(clubId)).Select(n => n.Id).First();
-                        player.ClubId = id;
+                List<Player> playersList = new List<Player>();
 
-                        AgeCategory ageCategory = AgeCategory.Cadet;
-                        switch (splits[6].ToLower())
+                var clubIds = _context.Clubs.Select(n => new {n.Id, n.Name});
+
+                using (var rd = new StreamReader(path))
+                {
+                    bool skipFirstRow = true;
+                    while (!rd.EndOfStream)
+                    {
+                        var splits = rd.ReadLine().Split(';');
+                        if (!skipFirstRow)
                         {
-                            case "juniori":
+                            Player player = new Player
                             {
-                                ageCategory = AgeCategory.Junior;
-                                break;
-                            }
-                            case "dorastenci":
+                                LastName = splits[0].Substring(0, 1).ToUpper() + splits[0].Substring(1).ToLower(),
+                                FirstName = splits[1],
+                                TitleBefore = splits[2],
+                                YearOfBirth = Convert.ToInt32(splits[3]),
+                                KrpId = Convert.ToInt32(splits[4])
+                            };
+                            string clubId = splits[5];
+                            var id = clubIds.Where(n => n.Name.Equals(clubId)).Select(n => n.Id).First();
+                            player.ClubId = id;
+
+                            AgeCategory ageCategory = AgeCategory.Cadet;
+                            switch (splits[6].ToLower())
                             {
-                                ageCategory = AgeCategory.Midgest;
-                                break;
+                                case "juniori":
+                                {
+                                    ageCategory = AgeCategory.Junior;
+                                    break;
+                                }
+                                case "dorastenci":
+                                {
+                                    ageCategory = AgeCategory.Midgest;
+                                    break;
+                                }
+                                case "seniori":
+                                {
+                                    ageCategory = AgeCategory.Senior;
+                                    break;
+                                }
+                                case "kadeti":
+                                {
+                                    ageCategory = AgeCategory.Cadet;
+                                    break;
+                                }
                             }
-                            case "seniori":
-                            {
-                                ageCategory = AgeCategory.Senior;
-                                break;
-                            }
-                            case "kadeti":
-                            {
-                                ageCategory = AgeCategory.Cadet;
-                                break;
-                            }
+
+                            player.AgeCategory = ageCategory;
+                            playersList.Add(player);
                         }
 
-                        player.AgeCategory = ageCategory;
-                        playersList.Add(player);
+                        skipFirstRow = false;
                     }
-
-                    skipFirstRow = false;
                 }
-            }
 
-            return playersList;
+                return playersList;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.StackTrace);
+            }
         }
 
         private static List<Club> ParseClubs(string path)

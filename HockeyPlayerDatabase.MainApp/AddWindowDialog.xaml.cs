@@ -52,7 +52,7 @@ namespace HockeyPlayerDatabase.MainApp
             if (ValidateFields())
             {
                 Enum.TryParse(AgeCategoryComboBox.Text, true, out AgeCategory category);
-                var clubIds = _context.Clubs.Select(n => new {n.Id, n.Name});
+                var clubIds = _context.Clubs.Select(n => new { n.Id, n.Name });
                 var id = clubIds.Where(n => n.Name.Equals(ClubComboBox.Text)).Select(n => n.Id).First();
 
                 if (_player != null)
@@ -94,17 +94,23 @@ namespace HockeyPlayerDatabase.MainApp
                 this.Close();
                 _parent.RefreshDataGrid();
             }
+            else
+            {
+                MessageBox.Show("Prosím zadajte validné vstupy", "status");
+            }
         }
 
         private bool ValidateFields()
         {
+            bool isAgeCateg = Enum.TryParse(AgeCategoryComboBox.Text, true, out AgeCategory category);
             bool isYearNumeric = int.TryParse(YearOfBirth.Text, out int year);
             bool isKrpNumeric = int.TryParse(KrpId.Text, out int krp);
+            bool isClubId = ClubComboBox.Text != "";
 
             return
                 (FirstName.Text.Length > 0
                  && LastName.Text.Length > 0
-                 && isYearNumeric && isKrpNumeric
+                 && isYearNumeric && isKrpNumeric && isAgeCateg && isClubId
                  && KrpId.Text.Length > 0);
         }
     }

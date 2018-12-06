@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Xml;
 using System.Xml.Serialization;
 using HockeyPlayerDatabase.Interfaces;
@@ -19,13 +18,20 @@ namespace HockeyPlayerDatabase.Model
         {
         }
 
-        public HockeyContext(string nameOrConnectionString) : base("name=" + nameOrConnectionString)
+        public HockeyContext(string nameOfCs) : base("name=" + nameOfCs)
         {
         }
 
         public IEnumerable<int> GetBiggestClubPlayerAges()
         {
-            throw new NotImplementedException();
+            var biggestClub = Clubs
+                .OrderByDescending(m => Players.Count(n => n.ClubId == m.Id))
+                .First();
+            var players = Players
+                .Where(n => n.ClubId == biggestClub.Id)
+                .Select(n => DateTime.Now.Year - n.YearOfBirth)
+                .Distinct();
+            return players;
         }
 
         public IQueryable<Club> GetClubs()
@@ -113,7 +119,7 @@ namespace HockeyPlayerDatabase.Model
             }
         }
 
-        private ReportResult GetReportResult(IQueryable<Player> players)
+        private static ReportResult GetReportResult(IQueryable<Player> players)
         {
             var average = players.Average(n => DateTime.Now.Year - n.YearOfBirth);
             var youngestPlayer = players.OrderByDescending(n => n.YearOfBirth).First();

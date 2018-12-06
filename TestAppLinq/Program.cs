@@ -10,6 +10,8 @@ namespace TestAppLinq
         static void Main(string[] args)
         {
             HockeyContext context = new HockeyContext();
+
+            DisplayAllLines(context.GetBiggestClubPlayerAges());
             Console.ReadLine();
         }
 
